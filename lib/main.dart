@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:repmaster/widgets/CategoryCard.dart';
+import 'package:repmaster/widgets/CategoryWorkoutScreen.dart';
 import './colors/AppCollors.dart';
 void main() {
   runApp(const MyApp());
@@ -66,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 16,),
 
             Padding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: 24),
               child: Text(
                 "Choose Category",
                 style: TextStyle(
@@ -93,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildLevelSelector(BuildContext context){
+    Set<String> _selectedLevel={"Begginer"};
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24,vertical: 12),
       child: SegmentedButton<String>(
@@ -103,6 +105,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
         selected: const {'Beginner'},
         onSelectionChanged: (newSelection) {
+          setState(() {
+            _selectedLevel=newSelection;
+          });
 
         },
         style: SegmentedButton.styleFrom(
@@ -137,7 +142,11 @@ class _MyHomePageState extends State<MyHomePage> {
         itemBuilder: (context, index){
           final cat= categories[index];
           return Categorycard(title: cat.title, icon: cat.icon, color: cat.color, onTap: (){
-            //Navigator.push -> CategoryWorkoutScreen(category: cat.title)
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder:
+              (context) => CategoryWorkoutScreen(category: cat.title))
+            );
           });
         }
     );
