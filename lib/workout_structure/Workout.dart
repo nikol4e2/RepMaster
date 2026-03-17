@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:repmaster/workout_structure/Exercise.dart';
+import 'package:repmaster/workout_structure/enums/Category_workout.dart';
 import 'package:repmaster/workout_structure/enums/WorkoutLevel.dart';
 
 class Workout {
 
     String name;
     Workoutlevel level;
-    Category category;
+    Category_workout category;
     List<Exercise> exercises;
 
 

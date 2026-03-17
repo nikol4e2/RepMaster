@@ -1,4 +1,4 @@
-enum Category{
+enum Category_workout{
   push,
   pull,
   pushPull,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:repmaster/widgets/CategoryCard.dart';
 import 'package:repmaster/widgets/CategoryWorkoutScreen.dart';
+import 'package:repmaster/workout_structure/enums/Category_workout.dart';
+import 'package:repmaster/workout_structure/enums/WorkoutLevel.dart';
 import './colors/AppCollors.dart';
 void main() {
   runApp(const MyApp());
@@ -13,8 +15,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      home: const MyHomePage(title: 'High Reps'),
+      title: 'RepMaster',
+      home: const MyHomePage(title: 'RepMaster'),
     );
   }
 }
@@ -32,7 +34,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  Set<String> _selectedLevel = {"Beginner"};
 
+  Workoutlevel get levelEnum {
+    switch (_selectedLevel.first) {
+      case 'Beginner':
+        return Workoutlevel.beginner;
+      case 'Intermediate':
+        return Workoutlevel.intermediate;
+      case 'Advanced':
+        return Workoutlevel.advanced;
+      default:
+        return Workoutlevel.beginner;
+    }
+  }
 
 
   @override
@@ -94,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildLevelSelector(BuildContext context){
-    Set<String> _selectedLevel={"Begginer"};
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24,vertical: 12),
       child: SegmentedButton<String>(
@@ -103,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ButtonSegment(value: 'Intermediate', label: Text('Intermediate')),
           ButtonSegment(value: 'Advanced', label: Text('Advanced')),
         ],
-        selected: const {'Beginner'},
+        selected: _selectedLevel,
         onSelectionChanged: (newSelection) {
           setState(() {
             _selectedLevel=newSelection;
@@ -123,11 +138,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildCategoryGrid(BuildContext context){
     final categories=[
-      _CategoryData("Push", Icons.arrow_upward_rounded, Colors.indigo),
-      _CategoryData("Pull", Icons.arrow_downward_rounded, Colors.deepOrange),
-      _CategoryData("Pull + Push", Icons.swap_horiz_rounded, Colors.purple),
-      _CategoryData("Abs", Icons.fitness_center_rounded, Colors.teal),
-      _CategoryData("Legs", Icons.directions_run_rounded, Colors.green)
+      _CategoryData("Push", Icons.arrow_upward_rounded, Colors.indigo,Category_workout.push),
+      _CategoryData("Pull", Icons.arrow_downward_rounded, Colors.deepOrange,Category_workout.pull),
+      _CategoryData("Pull + Push", Icons.swap_horiz_rounded, Colors.purple, Category_workout.pushPull),
+      _CategoryData("Abs", Icons.fitness_center_rounded, Colors.teal,Category_workout.abs),
+      _CategoryData("Legs", Icons.directions_run_rounded, Colors.green, Category_workout.legs)
 
     ];
 
@@ -145,7 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder:
-              (context) => CategoryWorkoutScreen(category: cat.title))
+              (_) => CategoryWorkoutScreen(category: cat.categoryEnum, level: levelEnum,))
             );
           });
         }
@@ -178,6 +193,7 @@ class _CategoryData{
   final String title;
   final IconData icon;
   final Color color;
+  final Category_workout categoryEnum;
 
-  _CategoryData(this.title, this.icon, this.color);
+  _CategoryData(this.title, this.icon, this.color,  this.categoryEnum);
 }
