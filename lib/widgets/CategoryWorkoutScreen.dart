@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:repmaster/colors/AppCollors.dart';
+import 'package:repmaster/widgets/WorkoutDetailScreen.dart';
 import 'package:repmaster/workout_structure/data/workout_data.dart';
 import 'package:repmaster/workout_structure/enums/Category_workout.dart';
 import 'package:repmaster/workout_structure/enums/WorkoutLevel.dart';
@@ -33,6 +34,7 @@ class CategoryWorkoutScreen extends StatelessWidget {
           child: ListTile(
             title: Text(workout.name),
             onTap:(){
+              Navigator.push(context, MaterialPageRoute(builder: (_) => WorkoutDetailScreen(workout: workout)));
 
             }
           )
