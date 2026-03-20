@@ -19,7 +19,7 @@ class CategoryWorkoutScreen extends StatelessWidget {
     final filteredWorkouts = WorkoutData.workouts
     .where((w) => w.category == category && w.level==level)
     .toList();
-    return Scaffold(
+    return Scaffold(backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text("${category.name.toUpperCase()} - ${level.name.toUpperCase()}"),
         backgroundColor: AppColors.primary,
@@ -29,10 +29,13 @@ class CategoryWorkoutScreen extends StatelessWidget {
         itemBuilder: (context,index)
         {
           final workout = filteredWorkouts[index];
-          return Card(
+          return Card(color:AppColors.surfaceBright,
+
           margin: EdgeInsets.all(12),
           child: ListTile(
-            title: Text(workout.name),
+            title: Text(workout.name,
+              style: TextStyle(color: AppColors.primary,fontWeight: FontWeight.bold,fontSize: 20),
+              textAlign: TextAlign.center,),
             onTap:(){
               Navigator.push(context, MaterialPageRoute(builder: (_) => WorkoutDetailScreen(workout: workout)));
 

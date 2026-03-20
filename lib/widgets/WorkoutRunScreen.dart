@@ -3,27 +3,49 @@ import "package:repmaster/colors/AppCollors.dart";
 
 import "../workout_structure/Workout.dart";
 
-
+import "dart:async";
 
 class WorkoutRunScreen extends StatefulWidget {
   final Workout workout;
 
-  const WorkoutRunScreen({super.key, required this.workout});
 
-  
+
+   const WorkoutRunScreen({super.key, required this.workout});
+
+
   @override
   State<WorkoutRunScreen> createState() => _WorkoutRunScreenState();
 }
 
 class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
 
-  final TextEditingController _controller = TextEditingController();
 
+
+  final TextEditingController _controller = TextEditingController();
+  
+  
+  Timer ? _restTimer;
+  bool isResting =false;
+  int restSeconds = 60;
   int activeExerciseIndex = 0;
   int activeSetIndex = 0;
 
+  double progress=1.0;
+  
+  bool _isLastSet(){
+    final exercise =widget.workout.exercises;
+    
+    return activeExerciseIndex == exercise.length-1 && activeSetIndex == exercise.last.sets.length-1;
+  }
+
   void _nextSet() {
     final exercises = widget.workout.exercises;
+
+    if (_isLastSet())
+    {
+      _showFinishDialog();
+      return;
+    }
 
     if (activeSetIndex < exercises[activeExerciseIndex].sets.length - 1) {
       activeSetIndex++;
@@ -37,149 +59,300 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
     setState(() {});
   }
 
+
+  void _startRestTimer(){
+
+    _restTimer?.cancel();
+    setState(() {
+      isResting=true;
+      restSeconds=60;
+      progress=1.0;
+    });
+
+    _restTimer=Timer.periodic(Duration(seconds: 1), (timer){
+      if(restSeconds>0)
+        {
+          setState(() {
+            restSeconds--;
+            progress=restSeconds/60;
+          });
+        }else {
+        timer.cancel();
+
+        setState(() {
+          isResting=false;
+          _nextSet();
+        });
+      }
+    });
+  }
+  
+  
+  void _showFinishDialog(){
+    showDialog(context: context, barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("Workout Complete"),
+        content: const Text("Bravo! You finished your workout."),
+        actions: [
+          TextButton(
+            onPressed: (){
+              Navigator.pop(context); //closing dialog
+              Navigator.pop(context); //going back
+            },
+            child: const Text("DONE"),
+          )
+        ],
+      )
+    
+    );
+  }
+
+  @override
+  void dispose() {
+    _restTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(widget.workout.name),
         backgroundColor: AppColors.primary,
       ),
-      body: ListView.builder(
-        itemCount: widget.workout.exercises.length,
-        itemBuilder: (context, i) {
-          final exercise = widget.workout.exercises[i];
+      body: Stack(
+        children:[ ListView.builder(
+          itemCount: widget.workout.exercises.length,
+          itemBuilder: (context, i) {
+            final exercise = widget.workout.exercises[i];
 
-          return Card(
-            margin: const EdgeInsets.all(12),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    exercise.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+            return Card(
+              color: AppColors.surface,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: AppColors.outline)
+              ),
+              margin: const EdgeInsets.all(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      exercise.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-                  Column(
-                    children: List.generate(exercise.sets.length, (j) {
-                      final set = exercise.sets[j];
+                    Column(
+                      children: List.generate(exercise.sets.length, (j) {
+                        final set = exercise.sets[j];
 
-                      final isActive =
-                          i == activeExerciseIndex &&
-                              j == activeSetIndex;
+                        final isActive =
+                            i == activeExerciseIndex &&
+                                j == activeSetIndex;
 
 
-                      if (isActive) {
-                        _controller.text = set.done.toString();
-                      }
+                        if (isActive) {
+                          _controller.text = set.done.toString();
+                        }
 
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        padding: EdgeInsets.all(isActive ? 16 : 10),
-                        decoration: BoxDecoration(
-                          color: isActive
-                              ? AppColors.primary.withOpacity(0.15)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          padding: EdgeInsets.all(isActive ? 16 : 10),
+                          decoration: BoxDecoration(
                             color: isActive
-                                ? AppColors.primary
-                                : Colors.grey.shade300,
-                            width: isActive ? 2 : 1,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-
-
-                            Row(
-                              children: [
-                                Text("Set ${j + 1}"),
-
-                                const Spacer(),
-
-                                isActive
-                                    ? SizedBox(
-                                  width: 70,
-                                  child: TextField(
-                                    controller: _controller,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      hintText: "${set.goal}",
-                                      isDense: true,
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 6),
-                                    ),
-                                    onChanged: (value) {
-                                      final val =
-                                          int.tryParse(value) ?? 0;
-                                      set.done = val;
-                                    },
-                                  ),
-                                )
-                                    : Text("${set.done}/${set.goal}"),
-                              ],
+                                ? AppColors.surfaceBright
+                                : AppColors.surface,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isActive
+                                  ? AppColors.primary
+                                  : AppColors.outline,
+                              width: isActive ? 2 : 1,
                             ),
-
-                            const SizedBox(height: 8),
-
-
-                            if (isActive)
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-
-                                      _nextSet();
-                                    });
-                                  },
-                                  child: const Text("COMPLETE SET"),
-                                ),
-                              ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
 
 
-                            if (isActive)
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () {
-                                      setState(() {
-                                        if (set.done > 0) set.done--;
-                                      });
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () {
-                                      setState(() {
-                                         set.done++;
-                                      });
-                                    },
-                                  ),
+                                  Text("Set ${j + 1}", style: TextStyle(color: AppColors.textSecondary),),
+
+                                  const Spacer(),
+
+                                  isActive
+                                      ? SizedBox(
+                                    width: 70,
+                                    child: TextField(
+                                      controller: _controller,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        hintText: "${set.goal}",
+                                        hintStyle: const TextStyle(color: AppColors.textSecondary),
+                                        filled: true,
+                                        fillColor: AppColors.surfaceDim,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          borderSide: BorderSide.none
+                                        ),
+                                        isDense: true,
+                                        contentPadding:
+                                        const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 6),
+                                      ),
+                                      onChanged: (value) {
+                                        final val =
+                                            int.tryParse(value) ?? 0;
+                                        set.done = val;
+                                      },
+                                      style: TextStyle(color: AppColors.textPrimary),
+                                    ),
+                                  )
+                                      : Text("${set.done}/${set.goal}"),
                                 ],
                               ),
-                          ],
+
+                              const SizedBox(height: 8),
+
+
+                              if (isActive)
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      foregroundColor: AppColors.onPrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10)
+                                      ),
+                                      padding: EdgeInsets.symmetric(vertical: 12)
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+
+
+                                      });
+                                      if (_isLastSet()) {
+                                        set.done = set.goal;
+                                        _showFinishDialog();
+                                      } else {
+                                        set.done = set.goal;
+                                        _startRestTimer();
+                                      }
+                                    },
+                                    child: const Text("COMPLETE SET", style: TextStyle(color: AppColors.onPrimary,fontWeight: FontWeight.bold),),
+                                  ),
+                                ),
+
+
+                              if (isActive)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove,color: AppColors.primary,),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (set.done > 0) set.done--;
+                                        });
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.add, color: AppColors.primary,),
+                                      onPressed: () {
+                                        setState(() {
+                                           set.done++;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        );
+                      }),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        if(isResting)
+          Container(
+            color: AppColors.background.withOpacity(0.95),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "REST",
+                    style: TextStyle(
+                      fontSize: 40,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  const SizedBox(height: 20,),
+                  SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 60,
+                          color: AppColors.restTimer,
+                          backgroundColor: AppColors.progressInactive,
                         ),
-                      );
-                    }),
-                  )
+                        Text(
+                          "$restSeconds",
+                          style: TextStyle(
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  
+                  
+                  ElevatedButton(
+                      style:ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.secondary,
+                        foregroundColor: AppColors.onSecondary
+                      ),
+                  onPressed: (){
+                    _restTimer?.cancel();
+                    setState(() {
+                      isResting=false;
+                      _nextSet();
+
+                    });
+                  }, child: Text("SKIP", style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),))
                 ],
               ),
             ),
-          );
-        },
+          )
+
+        ]
       ),
     );
   }

@@ -12,6 +12,7 @@ class WorkoutDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(workout.name),
         backgroundColor: AppColors.primary,
@@ -24,6 +25,7 @@ class WorkoutDetailScreen extends StatelessWidget {
               final exercise = workout.exercises[index];
 
               return Card(
+                color: AppColors.surfaceBright,
                 margin: const EdgeInsets.all(12),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -33,14 +35,15 @@ class WorkoutDetailScreen extends StatelessWidget {
                       Text(
                         exercise.name,
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary
                         ),
                       ),
 
                       const SizedBox(height: 10,),
-                      Text("Goal:"),
-
+                      Text("Goal:",style: TextStyle(color: AppColors.primary,fontSize: 18),),
+                      const SizedBox(height: 4,),
                       //Listing all the sets for the exercise
                     Wrap(
                       spacing: 8,
@@ -86,8 +89,9 @@ class WorkoutDetailScreen extends StatelessWidget {
                 child: const Text(
                   "START WORKOUT",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white
                   ),
                 ),
               ),
