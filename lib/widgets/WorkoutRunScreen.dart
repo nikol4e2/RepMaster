@@ -5,6 +5,8 @@ import "../workout_structure/Workout.dart";
 
 import "dart:async";
 
+import 'package:flutter_vibrate/flutter_vibrate.dart';
+
 class WorkoutRunScreen extends StatefulWidget {
   final Workout workout;
 
@@ -31,6 +33,31 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
   int activeSetIndex = 0;
 
   double progress=1.0;
+
+  double _calculateProgress(){
+    int totalSets =0;
+    int completedSets =0;
+
+    for(var ex in widget.workout.exercises) {
+      totalSets += ex.sets.length;
+    }
+
+    for(int i=0;i < widget.workout.exercises.length;i++)
+      {
+        for(int j=0;j<widget.workout.exercises[i].sets.length;j++)
+          {
+            if(i<activeExerciseIndex || (i ==activeExerciseIndex && j<activeSetIndex))
+              {
+                completedSets++;
+              }
+          }
+      }
+
+
+    return totalSets == 0 ? 0: completedSets/totalSets;
+
+
+  }
   
   bool _isLastSet(){
     final exercise =widget.workout.exercises;
@@ -60,7 +87,7 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
   }
 
 
-  void _startRestTimer(){
+   void  _startRestTimer()  {
 
     _restTimer?.cancel();
     setState(() {
@@ -69,7 +96,7 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
       progress=1.0;
     });
 
-    _restTimer=Timer.periodic(Duration(seconds: 1), (timer){
+    _restTimer=Timer.periodic(Duration(seconds: 1), (timer) async{
       if(restSeconds>0)
         {
           setState(() {
@@ -79,6 +106,10 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
         }else {
         timer.cancel();
 
+        if(await Vibrate.canVibrate)
+          {
+            Vibrate.feedback(FeedbackType.success);
+          }
         setState(() {
           isResting=false;
           _nextSet();
@@ -123,9 +154,18 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
       appBar: AppBar(
         title: Text(widget.workout.name),
         backgroundColor: AppColors.primary,
+
+        
       ),
       body: Stack(
-        children:[ ListView.builder(
+        children:[
+          LinearProgressIndicator(
+            value: _calculateProgress(),
+            minHeight: 6,
+            backgroundColor: AppColors.progressInactive,
+            valueColor: AlwaysStoppedAnimation(AppColors.progressActive),
+          ),
+          ListView.builder(
           itemCount: widget.workout.exercises.length,
           itemBuilder: (context, i) {
             final exercise = widget.workout.exercises[i];
@@ -166,122 +206,130 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
                           _controller.text = set.done.toString();
                         }
 
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          padding: EdgeInsets.all(isActive ? 16 : 10),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? AppColors.surfaceBright
-                                : AppColors.surface,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
+                        return GestureDetector(
+                          onHorizontalDragEnd: (details){
+                            if(details.primaryVelocity !>0)
+                              {
+                                _nextSet();
+                              }
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            padding: EdgeInsets.all(isActive ? 16 : 10),
+                            decoration: BoxDecoration(
                               color: isActive
-                                  ? AppColors.primary
-                                  : AppColors.outline,
-                              width: isActive ? 2 : 1,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-
-
-                              Row(
-                                children: [
-                                  Text("Set ${j + 1}", style: TextStyle(color: AppColors.textSecondary),),
-
-                                  const Spacer(),
-
-                                  isActive
-                                      ? SizedBox(
-                                    width: 70,
-                                    child: TextField(
-                                      controller: _controller,
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        hintText: "${set.goal}",
-                                        hintStyle: const TextStyle(color: AppColors.textSecondary),
-                                        filled: true,
-                                        fillColor: AppColors.surfaceDim,
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                          borderSide: BorderSide.none
-                                        ),
-                                        isDense: true,
-                                        contentPadding:
-                                        const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 6),
-                                      ),
-                                      onChanged: (value) {
-                                        final val =
-                                            int.tryParse(value) ?? 0;
-                                        set.done = val;
-                                      },
-                                      style: TextStyle(color: AppColors.textPrimary),
-                                    ),
-                                  )
-                                      : Text("${set.done}/${set.goal}"),
-                                ],
+                                  ? AppColors.surfaceBright
+                                  : AppColors.surface,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isActive
+                                    ? AppColors.primary
+                                    : AppColors.outline,
+                                width: isActive ? 2 : 1,
                               ),
-
-                              const SizedBox(height: 8),
-
-
-                              if (isActive)
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      foregroundColor: AppColors.onPrimary,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10)
-                                      ),
-                                      padding: EdgeInsets.symmetric(vertical: 12)
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
 
 
-                                      });
-                                      if (_isLastSet()) {
-                                        set.done = set.goal;
-                                        _showFinishDialog();
-                                      } else {
-                                        set.done = set.goal;
-                                        _startRestTimer();
-                                      }
-                                    },
-                                    child: const Text("COMPLETE SET", style: TextStyle(color: AppColors.onPrimary,fontWeight: FontWeight.bold),),
-                                  ),
-                                ),
-
-
-                              if (isActive)
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.remove,color: AppColors.primary,),
-                                      onPressed: () {
-                                        setState(() {
-                                          if (set.done > 0) set.done--;
-                                        });
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.add, color: AppColors.primary,),
-                                      onPressed: () {
-                                        setState(() {
-                                           set.done++;
-                                        });
-                                      },
-                                    ),
+                                    Text("Set ${j + 1}", style: TextStyle(color: AppColors.textSecondary),),
+
+                                    const Spacer(),
+
+                                    isActive
+                                        ? SizedBox(
+                                      width: 70,
+                                      child: TextField(
+                                        controller: _controller,
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                          hintText: "${set.goal}",
+                                          hintStyle: const TextStyle(color: AppColors.textSecondary),
+                                          filled: true,
+                                          fillColor: AppColors.surfaceDim,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            borderSide: BorderSide.none
+                                          ),
+                                          isDense: true,
+                                          contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 6),
+                                        ),
+                                        onChanged: (value) {
+                                          final val =
+                                              int.tryParse(value) ?? 0;
+                                          set.done = val;
+                                        },
+                                        style: TextStyle(color: AppColors.textPrimary),
+                                      ),
+                                    )
+                                        : Text("${set.done}/${set.goal}"),
                                   ],
                                 ),
-                            ],
+
+                                const SizedBox(height: 8),
+
+
+                                if (isActive)
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: AppColors.onPrimary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10)
+                                        ),
+                                        padding: EdgeInsets.symmetric(vertical: 12)
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+
+
+                                        });
+                                        if (_isLastSet()) {
+                                          set.done = set.goal;
+                                          _showFinishDialog();
+                                        } else {
+                                          set.done = set.goal;
+                                          _startRestTimer();
+                                        }
+                                      },
+                                      child: const Text("COMPLETE SET", style: TextStyle(color: AppColors.onPrimary,fontWeight: FontWeight.bold),),
+                                    ),
+                                  ),
+
+
+                                if (isActive)
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.remove,color: AppColors.primary,),
+                                        onPressed: () {
+                                          setState(() {
+                                            if (set.done > 0) set.done--;
+                                          });
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.add, color: AppColors.primary,),
+                                        onPressed: () {
+                                          setState(() {
+                                             set.done++;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
                           ),
                         );
                       }),

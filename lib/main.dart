@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:repmaster/widgets/CategoryCard.dart';
+import 'package:repmaster/colors/AppCollors.dart';
 import 'package:repmaster/widgets/CategoryWorkoutScreen.dart';
 import 'package:repmaster/workout_structure/enums/Category_workout.dart';
 import 'package:repmaster/workout_structure/enums/WorkoutLevel.dart';
-import './colors/AppCollors.dart';
+import 'package:repmaster/widgets/CategoryCard.dart';
+import 'package:repmaster/widgets/WorkoutsScreen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -11,189 +13,130 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'RepMaster',
-      home: const MyHomePage(title: 'RepMaster'),
+      debugShowCheckedModeBanner: false,
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-
-
-  final String title;
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
 
-  Set<String> _selectedLevel = {"Beginner"};
-
-  Workoutlevel get levelEnum {
-    switch (_selectedLevel.first) {
-      case 'Beginner':
-        return Workoutlevel.beginner;
-      case 'Intermediate':
-        return Workoutlevel.intermediate;
-      case 'Advanced':
-        return Workoutlevel.advanced;
-      default:
-        return Workoutlevel.beginner;
-    }
-  }
-
+  final List<Widget> _pages = [
+    const WelcomeScreen(), // Home
+    const WorkoutsScreen(), // Workouts
+    //const MoreScreen(), // More
+  ];
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-
-        backgroundColor: Colors.transparent,
-
-        title: Text(widget.title,
-          style: TextStyle(
-              color: AppColors.primary,
-              fontSize:28,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2
-          )
-
-
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(onPressed: (){}, icon: const Icon(Icons.person_outline_rounded))
+      body: _pages[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_rounded), label: "Home"),
+          NavigationDestination(icon: Icon(Icons.fitness_center_rounded), label: "Workouts"),
+          NavigationDestination(icon: Icon(Icons.more_horiz_rounded), label: "More"),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildLevelSelector(context),
-            const SizedBox(height: 16,),
+    );
+  }
+}
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                "Choose Category",
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            Text(
+              "Welcome to RepMaster",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    blurRadius: 8,
+                    color: Colors.black38,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            Text(
+              "Follow ready-made workouts crafted to push your strength and endurance.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 60),
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.primary,
+                padding:
+                const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                elevation: 8,
+                shadowColor: Colors.black45,
+              ),
+              onPressed: () {
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const WorkoutsScreen()),
+                );
+              },
+              child: const Text(
+                "Go to Workouts",
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(height: 20,),
-
-            Expanded(
-                child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                child: _buildCategoryGrid(context),
-                )
-            )
           ],
         ),
-
-      ),
-      bottomNavigationBar: _buildBottomNavBar(),
-    );
-  }
-
-  Widget _buildLevelSelector(BuildContext context){
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24,vertical: 12),
-      child: SegmentedButton<String>(
-        segments: const [
-          ButtonSegment(value: "Beginner", label: Text("Beginner")),
-          ButtonSegment(value: 'Intermediate', label: Text('Intermediate')),
-          ButtonSegment(value: 'Advanced', label: Text('Advanced')),
-        ],
-        selected: _selectedLevel,
-        onSelectionChanged: (newSelection) {
-          setState(() {
-            _selectedLevel=newSelection;
-          });
-
-        },
-        style: SegmentedButton.styleFrom(
-          backgroundColor: AppColors.surface,
-          foregroundColor: AppColors.textSecondary,
-          selectedBackgroundColor: AppColors.primary,
-          selectedForegroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
       ),
     );
   }
-
-  Widget _buildCategoryGrid(BuildContext context){
-    final categories=[
-      _CategoryData("Push", Icons.arrow_upward_rounded, Colors.indigo,Category_workout.push),
-      _CategoryData("Pull", Icons.arrow_downward_rounded, Colors.deepOrange,Category_workout.pull),
-      _CategoryData("Pull + Push", Icons.swap_horiz_rounded, Colors.purple, Category_workout.pushPull),
-      _CategoryData("Abs", Icons.fitness_center_rounded, Colors.teal,Category_workout.abs),
-      _CategoryData("Legs", Icons.directions_run_rounded, Colors.green, Category_workout.legs)
-
-    ];
-
-    return GridView.builder(physics: BouncingScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.1,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16
-        ),
-        itemCount: categories.length,
-        itemBuilder: (context, index){
-          final cat= categories[index];
-          return Categorycard(title: cat.title, icon: cat.icon, color: cat.color, onTap: (){
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder:
-              (_) => CategoryWorkoutScreen(category: cat.categoryEnum, level: levelEnum,))
-            );
-          });
-        }
-    );
-
-
-  }
-
-  Widget _buildBottomNavBar(){
-    return NavigationBar(
-        destinations: [
-          NavigationDestination(icon: Icon(Icons.home_rounded), label: "home"),
-          NavigationDestination(icon: Icon(Icons.fitness_center_rounded), label: 'Workouts'),
-          NavigationDestination(icon: Icon(Icons.more_horiz_rounded), label: 'More'),
-        ],
-      selectedIndex: 0,// Home is selected
-      onDestinationSelected: (index){
-        //TODO handle navigation
-      },
-    );
-  }
-
-
-
-
-}
-
-
-class _CategoryData{
-  final String title;
-  final IconData icon;
-  final Color color;
-  final Category_workout categoryEnum;
-
-  _CategoryData(this.title, this.icon, this.color,  this.categoryEnum);
 }
