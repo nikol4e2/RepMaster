@@ -33,14 +33,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const WelcomeScreen(), // Home
-    const WorkoutsScreen(), // Workouts
-    //const MoreScreen(), // More
-  ];
+
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _pages = [
+      WelcomeScreen(onStart: () =>changeTab(1)), // Home
+      const WorkoutsScreen(), // Workouts
+      //const MoreScreen(), // More
+    ];
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: NavigationBar(
@@ -58,10 +59,19 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+
+  void changeTab(int index){
+    setState(() {
+      _currentIndex=index;
+    });
+  }
 }
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+
+  final VoidCallback onStart;
+  const WelcomeScreen({super.key,required this.onStart});
 
   @override
   Widget build(BuildContext context) {
@@ -118,14 +128,9 @@ class WelcomeScreen extends StatelessWidget {
                 elevation: 8,
                 shadowColor: Colors.black45,
               ),
-              onPressed: () {
+              onPressed: onStart
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const WorkoutsScreen()),
-                );
-              },
+              ,
               child: const Text(
                 "Go to Workouts",
                 style: TextStyle(
