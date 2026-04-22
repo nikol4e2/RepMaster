@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:repmaster/colors/AppCollors.dart';
 import 'package:repmaster/widgets/CategoryWorkoutScreen.dart';
+import 'package:repmaster/widgets/ExercisesScreen.dart';
 import 'package:repmaster/workout_structure/enums/Category_workout.dart';
 import 'package:repmaster/workout_structure/enums/WorkoutLevel.dart';
 import 'package:repmaster/widgets/CategoryCard.dart';
@@ -40,7 +41,8 @@ class _HomePageState extends State<HomePage> {
     final List<Widget> _pages = [
       WelcomeScreen(onStart: () =>changeTab(1)), // Home
       const WorkoutsScreen(), // Workouts
-      //const MoreScreen(), // More
+       ExercisesScreen(),
+
     ];
     return Scaffold(
       body: _pages[_currentIndex],
@@ -54,7 +56,8 @@ class _HomePageState extends State<HomePage> {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_rounded), label: "Home"),
           NavigationDestination(icon: Icon(Icons.fitness_center_rounded), label: "Workouts"),
-          NavigationDestination(icon: Icon(Icons.more_horiz_rounded), label: "More"),
+          NavigationDestination(icon: Icon(Icons.list_alt_rounded), label: "Exercises")
+
         ],
       ),
     );
