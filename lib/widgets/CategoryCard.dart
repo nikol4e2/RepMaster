@@ -4,13 +4,13 @@ import 'package:repmaster/colors/AppCollors.dart';
 class Categorycard extends StatelessWidget {
 
   final String title;
-  final IconData icon;
+  final String imagePath;
   final Color color;
   final VoidCallback onTap;
 
 
   const Categorycard({required this.title,
-    required this.icon,
+    required this.imagePath,
     required this.color,
     required this.onTap,});
 
@@ -34,7 +34,7 @@ class Categorycard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 48, color: color,),
+           Image.asset(imagePath, height: 70, width: 70, fit: BoxFit.contain,),
             SizedBox(height: 12,),
             Text(title,style: TextStyle(color: AppColors.primary,fontSize: 18, fontWeight: FontWeight.w600),)
           ],

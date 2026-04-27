@@ -109,12 +109,15 @@ class WelcomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
-            Text(
-              "Follow ready-made workouts crafted to push your strength and endurance.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white70,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                "Follow ready-made workouts crafted to push your strength and endurance.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white70,
+                ),
               ),
             ),
             const SizedBox(height: 60),

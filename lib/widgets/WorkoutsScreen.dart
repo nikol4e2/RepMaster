@@ -103,11 +103,11 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
 
   Widget _buildCategoryGrid(BuildContext context) {
     final categories = [
-      _CategoryData("Push", Icons.arrow_upward_rounded, Colors.indigo, Category_workout.push),
-      _CategoryData("Pull", Icons.arrow_downward_rounded, Colors.deepOrange, Category_workout.pull),
-      _CategoryData("Pull + Push", Icons.swap_horiz_rounded, Colors.purple, Category_workout.pushPull),
-      _CategoryData("Abs", Icons.fitness_center_rounded, Colors.teal, Category_workout.abs),
-      _CategoryData("Legs", Icons.directions_run_rounded, Colors.green, Category_workout.legs)
+      _CategoryData("Push", "assets/images/chest.png", Colors.indigo, Category_workout.push),
+      _CategoryData("Pull", "assets/images/back.png", Colors.deepOrange, Category_workout.pull),
+      _CategoryData("Pull + Push", "assets/images/chest.png", Colors.purple, Category_workout.pushPull),
+      _CategoryData("Abs", "assets/images/abs.png", Colors.teal, Category_workout.abs),
+      _CategoryData("Legs", "assets/images/legs.png", Colors.green, Category_workout.legs)
     ];
 
     return GridView.builder(
@@ -123,7 +123,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
         final cat = categories[index];
         return Categorycard(
           title: cat.title,
-          icon: cat.icon,
+          imagePath: cat.image,
           color: cat.color,
           onTap: () {
             Navigator.push(
@@ -153,9 +153,9 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
 
 class _CategoryData {
   final String title;
-  final IconData icon;
+  final String image;
   final Color color;
   final Category_workout categoryEnum;
 
-  _CategoryData(this.title, this.icon, this.color, this.categoryEnum);
+  _CategoryData(this.title, this.image, this.color, this.categoryEnum);
 }
