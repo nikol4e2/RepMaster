@@ -24,8 +24,8 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
 
 
   final TextEditingController _controller = TextEditingController();
-  
-  
+
+
   Timer ? _restTimer;
   bool isResting =false;
   int restSeconds = 60;
@@ -58,10 +58,10 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
 
 
   }
-  
+
   bool _isLastSet(){
     final exercise =widget.workout.exercises;
-    
+
     return activeExerciseIndex == exercise.length-1 && activeSetIndex == exercise.last.sets.length-1;
   }
 
@@ -117,8 +117,8 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
       }
     });
   }
-  
-  
+
+
   void _showFinishDialog(){
     showDialog(context: context, barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -134,7 +134,7 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
           )
         ],
       )
-    
+
     );
   }
 
@@ -155,7 +155,7 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
         title: Text(widget.workout.name),
         backgroundColor: AppColors.primary,
 
-        
+
       ),
       body: Stack(
         children:[
@@ -186,7 +186,7 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
                     Text(
                       exercise.name,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary
                       ),
@@ -237,10 +237,11 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
 
                                 Row(
                                   children: [
-                                    Text("Set ${j + 1}", style: TextStyle(color: AppColors.textSecondary),),
+                                    Text("Set ${j + 1} ", style: TextStyle(color: AppColors.textSecondary, fontSize: 17, fontWeight: FontWeight.bold),),
 
                                     const Spacer(),
-
+                                    Text("Target: ${set.goal}", style: TextStyle(color: AppColors.primary, fontSize: 17, fontWeight: FontWeight.bold),),
+                                    SizedBox(width: 10,),
                                     isActive
                                         ? SizedBox(
                                       width: 70,
@@ -269,7 +270,7 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
                                         style: TextStyle(color: AppColors.textPrimary),
                                       ),
                                     )
-                                        : Text("${set.done}/${set.goal}"),
+                                        :  Text("Done: ${set.done}" , style: TextStyle(color: AppColors.primary, fontSize: 17, fontWeight: FontWeight.bold),),
                                   ],
                                 ),
 
@@ -289,15 +290,17 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
                                         padding: EdgeInsets.symmetric(vertical: 12)
                                       ),
                                       onPressed: () {
+                                        final input = int.tryParse(_controller.text) ?? set.goal;
+
                                         setState(() {
-
-
+                                          set.done=input;
                                         });
+
                                         if (_isLastSet()) {
-                                          set.done = set.goal;
+
                                           _showFinishDialog();
                                         } else {
-                                          set.done = set.goal;
+
                                           _startRestTimer();
                                         }
                                       },
@@ -380,8 +383,8 @@ class _WorkoutRunScreenState extends State<WorkoutRunScreen> {
                     ),
                   ),
                   SizedBox(height: 20,),
-                  
-                  
+
+
                   ElevatedButton(
                       style:ElevatedButton.styleFrom(
                         backgroundColor: AppColors.secondary,

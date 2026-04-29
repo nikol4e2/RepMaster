@@ -105,7 +105,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
     final categories = [
       _CategoryData("Push", "assets/images/chest.png", Colors.indigo, Category_workout.push),
       _CategoryData("Pull", "assets/images/back.png", Colors.deepOrange, Category_workout.pull),
-      _CategoryData("Pull + Push", "assets/images/chest.png", Colors.purple, Category_workout.pushPull),
+      _CategoryData("Pull + Push", "assets/images/both.png", Colors.purple, Category_workout.pushPull),
       _CategoryData("Abs", "assets/images/abs.png", Colors.teal, Category_workout.abs),
       _CategoryData("Legs", "assets/images/legs.png", Colors.green, Category_workout.legs)
     ];
