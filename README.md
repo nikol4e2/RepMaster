@@ -1,16 +1,47 @@
-# repmaster
+#  RepMaster
 
-A new Flutter project.
+RepMaster is a Flutter-based calisthenics workout template app focused on rep-based training programs.
 
-## Getting Started
+It provides structured, pre-built workout routines designed specifically for bodyweight training, helping users follow consistent calisthenics progressions without the need for manual workout planning.
 
-This project is a starting point for a Flutter application.
+##  Focus
 
-A few resources to get you started if this is your first Flutter project:
+RepMaster is not a workout tracker.
+It is a **template-driven training app** built for:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+* Calisthenics routines
+* Rep-focused progression
+* Structured workout splits
+* Strength and control development
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+##  Features
+
+* Pre-built calisthenics workout templates
+*  Push / Pull / Legs / Full Body routines
+*  Rep and set structured programming
+*  Progression-based training plans
+* Skill-focused workouts (pull-ups, dips, core, etc.)
+* Clean Flutter UI optimized for quick access
+*  Lightweight and fast navigation
+
+## Built With
+
+* Flutter
+* Dart
+
+##  Example Templates
+
+* Beginner Calisthenics Full Body
+* Push / Pull / Legs Split
+* Dip Strength Builder
+* Core Stability Routine
+
+##  Purpose
+
+RepMaster is designed for athletes who prefer **structured calisthenics programs instead of random workouts**.
+
+It helps users stay consistent and follow proven rep-based progressions for long-term strength development.
+
+
+
+
